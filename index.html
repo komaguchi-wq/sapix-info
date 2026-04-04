@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>SAPIX情報</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -38,6 +38,7 @@ body {
   width: 100%;
   height: auto;
   object-fit: contain;
+  touch-action: pinch-zoom;
 }
 .nav {
   display: flex;
@@ -85,12 +86,18 @@ body {
 <div class="slider" id="slider">
   <div class="slide"><img src="images/schedule_p1.png" alt="前期スケジュール"></div>
   <div class="slide"><img src="images/schedule_p3.png" alt="テスト・講習情報"></div>
+  <div class="slide"><img src="images/coreplus_rika.png" alt="理科コアプラス確認テスト範囲表"></div>
+  <div class="slide"><img src="images/coreplus_shakai.png" alt="社会コアプラス確認テスト範囲表"></div>
+  <div class="slide"><img src="images/kotobanavi_check.png" alt="言葉ナビ・国語Aデイリーチェック"></div>
 </div>
 <div class="nav">
   <button class="arrow" id="prev" disabled>&#9664;</button>
   <div class="dots" id="dots">
     <div class="dot active" data-index="0"></div>
     <div class="dot" data-index="1"></div>
+    <div class="dot" data-index="2"></div>
+    <div class="dot" data-index="3"></div>
+    <div class="dot" data-index="4"></div>
   </div>
   <button class="arrow" id="next">&#9654;</button>
 </div>
@@ -99,7 +106,7 @@ body {
 const slider = document.getElementById('slider');
 const dots = document.querySelectorAll('.dot');
 let current = 0;
-const total = 2;
+const total = 5;
 let startX = 0;
 let diffX = 0;
 let dragging = false;
@@ -119,6 +126,7 @@ prevBtn.addEventListener('click', () => goTo(current - 1));
 nextBtn.addEventListener('click', () => goTo(current + 1));
 
 slider.addEventListener('touchstart', e => {
+  if (e.touches.length > 1) { dragging = false; return; }
   startX = e.touches[0].clientX;
   diffX = 0;
   dragging = true;
@@ -126,14 +134,15 @@ slider.addEventListener('touchstart', e => {
 });
 
 slider.addEventListener('touchmove', e => {
-  if (!dragging) return;
+  if (!dragging || e.touches.length > 1) { dragging = false; return; }
   diffX = e.touches[0].clientX - startX;
   slider.style.transform = `translateX(calc(-${current * 100}vw + ${diffX}px))`;
 });
 
 slider.addEventListener('touchend', () => {
-  dragging = false;
   slider.style.transition = 'transform 0.3s ease';
+  if (!dragging) { goTo(current); dragging = false; return; }
+  dragging = false;
   if (diffX > 50) goTo(current - 1);
   else if (diffX < -50) goTo(current + 1);
   else goTo(current);
